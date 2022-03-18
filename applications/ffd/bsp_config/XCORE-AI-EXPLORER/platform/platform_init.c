@@ -33,6 +33,7 @@ static void mclk_init(chanend_t other_tile_c)
 static void flash_init(void)
 {
 #if ON_TILE(FLASH_TILE_NO)
+#if appconfFLASH_ENABLED
     rtos_qspi_flash_init(
             qspi_flash_ctx,
             FLASH_CLKBLK,
@@ -56,6 +57,7 @@ static void flash_init(void)
             0,
 
             qspi_flash_page_program_1_4_4);
+#endif
 #endif
 }
 

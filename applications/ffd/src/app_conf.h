@@ -30,7 +30,11 @@
 #define appconfINFERENCE_FRAMES_PER_INFERENCE   200
 
 #ifndef appconfINFERENCE_ENABLED
-#define appconfINFERENCE_ENABLED   1
+#define appconfINFERENCE_ENABLED   0
+#endif
+
+#ifndef appconfFLASH_ENABLED
+#define appconfFLASH_ENABLED  0
 #endif
 
 #ifndef appconfI2S_ENABLED

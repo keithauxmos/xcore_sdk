@@ -153,6 +153,14 @@ void audio_pipeline_init(
         configMINIMAL_STACK_SIZE + RTOS_THREAD_STACK_SIZE(stage_agc) + RTOS_THREAD_STACK_SIZE(audio_pipeline_output_i),
     };
 
+    rtos_printf("Pipeline uses approximately %u words of stack\n",
+    (configMINIMAL_STACK_SIZE * 3) +
+    + RTOS_THREAD_STACK_SIZE(stage_vad_and_ic)
+    + RTOS_THREAD_STACK_SIZE(audio_pipeline_input_i)
+    + RTOS_THREAD_STACK_SIZE(stage_ns)
+    + RTOS_THREAD_STACK_SIZE(stage_agc)
+    + RTOS_THREAD_STACK_SIZE(audio_pipeline_output_i));
+
     initialize_pipeline_stages();
 
     generic_pipeline_init((pipeline_input_t)audio_pipeline_input_i,

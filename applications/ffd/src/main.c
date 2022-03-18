@@ -30,6 +30,10 @@
 #include "keyword_inf_eng.h"
 #include "inference_hmi/inference_hmi.h"
 
+#if ON_TILE(0)
+#include "xcore_clock_control.h"
+#endif
+
 volatile int mic_from_usb = appconfMIC_SRC_DEFAULT;
 
 void audio_pipeline_input(void *input_app_data,
@@ -129,7 +133,7 @@ void vApplicationMallocFailedHook(void)
 static void mem_analysis(void)
 {
 	for (;;) {
-		// rtos_printf("Tile[%d]:\n\tMinimum heap free: %d\n\tCurrent heap free: %d\n", THIS_XCORE_TILE, xPortGetMinimumEverFreeHeapSize(), xPortGetFreeHeapSize());
+		rtos_printf("Tile[%d]:\n\tMinimum heap free: %d\n\tCurrent heap free: %d\n", THIS_XCORE_TILE, xPortGetMinimumEverFreeHeapSize(), xPortGetFreeHeapSize());
 		vTaskDelay(pdMS_TO_TICKS(5000));
 	}
 }
@@ -157,6 +161,12 @@ void startup_task(void *arg)
 
 #if ON_TILE(AUDIO_PIPELINE_TILE_NO)
     audio_pipeline_init(NULL, NULL);
+#endif
+#if ON_TILE(0)
+    enable_local_tile_processor_clock_divider();
+
+    rtos_printf("power down\n");
+    disable_local_tile_processor_clock();
 #endif
 
     mem_analysis();

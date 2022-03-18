@@ -34,7 +34,9 @@ static void gpio_start(void)
 static void flash_start(void)
 {
 #if ON_TILE(FLASH_TILE_NO)
+#if appconfFLASH_ENABLED
     rtos_qspi_flash_start(qspi_flash_ctx, appconfQSPI_FLASH_TASK_PRIORITY);
+#endif
 #endif
 }
 
