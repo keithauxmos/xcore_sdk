@@ -10,9 +10,11 @@
 
 #include "platform/platform_init.h"
 #include "platform/driver_instances.h"
+#include "spi_slave_app.h"
 
 
 
+#if APPCONF_SPI_I2C_MASTER_TEST == 1
 void spi_master_task(void *arg) {
   rtos_printf("spi send 0x55\n");
   uint8_t spi_tx_buf[2]={0xAA,0x55};
@@ -29,6 +31,64 @@ void spi_master_task(void *arg) {
     vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
+
+#define I2C_DEVICE_ADD  0x23
+#define I2C_DEVICE_REG_ADD  0x45
+void i2c_master_task(void *arg) {
+  rtos_printf("i2c send 0x55\n");
+  uint8_t I2C_tx_buf[2]={0x99,0x88};
+  uint8_t spi_rx_buf[2];
+  size_t byte_sent=0;
+
+  for (;;) {
+    rtos_i2c_master_reg_write(i2c_master_ctx, I2C_DEVICE_ADD, I2C_DEVICE_REG_ADD, I2C_tx_buf[0]);
+
+    // rtos_printf("SPI Tx spi_rx_buf[0]0x%x, spi_rx_buf[1]0x%x\n",spi_rx_buf[0],spi_rx_buf[1]);
+    vTaskDelay(pdMS_TO_TICKS(1000));
+  }
+}
+
+void create_spi_master_task()
+{
+#if ON_TILE(0)
+  xTaskCreate((TaskFunction_t)spi_master_task, "spi_master_task",
+              RTOS_THREAD_STACK_SIZE(spi_master_task), NULL,
+              configMAX_PRIORITIES - 1, NULL);
+#endif
+}
+
+void create_i2c_master_task()
+{
+#if ON_TILE(0)
+  xTaskCreate((TaskFunction_t)i2c_master_task, "i2c_master_task",
+              RTOS_THREAD_STACK_SIZE(i2c_master_task), NULL,
+              configMAX_PRIORITIES - 1, NULL);
+#endif
+}
+#endif //#if APPCONF_SPI_I2C_MASTER_TEST == 1
+
+
+
+#if APPCONF_SPI_I2C_SLAVE_TEST == 1
+
+void create_spi_slave_task()
+{
+#if ON_TILE(0)
+  xTaskCreate((TaskFunction_t)spi_slave_task, "spi_slave_task",
+              RTOS_THREAD_STACK_SIZE(spi_slave_task), NULL,
+              configMAX_PRIORITIES - 1, NULL);
+#endif
+}
+
+void create_i2c_slave_task()
+{
+// #if ON_TILE(0)
+//   xTaskCreate((TaskFunction_t)i2c_slave_task, "i2c_slave_task",
+//               RTOS_THREAD_STACK_SIZE(i2c_slave_task), NULL,
+//               configMAX_PRIORITIES - 1, NULL);
+// #endif
+}
+#endif  //APPCONF_SPI_I2C_SLAVE_TEST
 
 void tile0_hello_task(void *arg) {
   rtos_printf("Hello task running from tile %d on core %d\n", THIS_XCORE_TILE,
@@ -50,16 +110,6 @@ void create_hello_task()
 }
 
 
-
-void create_spi_master_task()
-{
-#if ON_TILE(0)
-  xTaskCreate((TaskFunction_t)spi_master_task, "spi_master_task",
-              RTOS_THREAD_STACK_SIZE(spi_master_task), NULL,
-              configMAX_PRIORITIES - 1, NULL);
-#endif
-}
-
 void startup_task(void *arg)
 {
     rtos_printf("Startup task running from tile %d on core %d\n", THIS_XCORE_TILE, portGET_CORE_ID());
@@ -68,7 +118,17 @@ void startup_task(void *arg)
 
 #if ON_TILE(0)
     create_hello_task();
+
+    #if APPCONF_SPI_I2C_MASTER_TEST == 1
     create_spi_master_task();
+    create_i2c_master_task();
+    #endif
+
+    #if APPCONF_SPI_I2C_SLAVE_TEST == 1
+    create_spi_slave_task();
+
+    #endif
+
 #endif
 
 	for (;;) {
