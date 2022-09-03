@@ -20,6 +20,8 @@ static uint8_t dummy_app_data_i2c=0;
 
 i2c_test_ctx_t test_ctx_i2c;
 
+#if APPCONF_SPI_I2C_SLAVE_TEST == 1
+
 RTOS_I2C_SLAVE_CALLBACK_ATTR
 static void i2c_slave_start(rtos_i2c_slave_t *ctx, void *app_data)
 {
@@ -29,55 +31,36 @@ static void i2c_slave_start(rtos_i2c_slave_t *ctx, void *app_data)
 RTOS_I2C_SLAVE_CALLBACK_ATTR
 static void i2c_slave_rx(rtos_i2c_slave_t *ctx, void *app_data, uint8_t *data, size_t len)
 {
-    i2c_test_ctx_t *test_ctx_i2c = (i2c_test_ctx_t*)ctx->app_data;
-    rtos_printf("i2c_slave_rx called\n");
-    // if (test_ctx->slave_rx[test_ctx_i2c->cur_test] != NULL)
-    // {
-    //     I2C_SLAVE_RX_ATTR i2c_slave_rx_t fn;
-    //     fn = test_ctx_i2c->slave_rx[test_ctx_i2c->cur_test];
-    //     fn(ctx, app_data, data, len);
-    // } else {
-    //     rtos_printf("SLAVE missing slave_rx callback on test %d", test_ctx_i2c->cur_test);
-    // }
+    int i;
+    rtos_printf("i2c_slave_rx called, data len%d\n", len);
+    for(i=0;i<len;i++){
+        printf("i2c data %d: 0x%x \n",i,data[i]);
+    }
 }
 
 RTOS_I2C_SLAVE_CALLBACK_ATTR
 static size_t i2c_slave_tx_start(rtos_i2c_slave_t *ctx, void *app_data, uint8_t **data)
 {
-    i2c_test_ctx_t *test_ctx_i2c = (i2c_test_ctx_t*)ctx->app_data;
-    size_t len = 0;
+    size_t len = 5;
+    uint8_t i2c_tx_data[5] = {1,2,3,4,5};
 
-    // if (test_ctx_i2c->slave_tx_start[test_ctx_i2c->cur_test] != NULL)
-    // {
-    //     I2C_SLAVE_RX_ATTR i2c_slave_tx_start_t fn;
-    //     fn = test_ctx_i2c->slave_tx_start[test_ctx_i2c->cur_test];
-    //     len = fn(ctx, app_data, data);
-    // } else {
-    //     rtos_printf("SLAVE missing i2c_slave_tx_start callback on test %d", test_ctx_i2c->cur_test);
-    // }
+    rtos_printf("i2c_slave_tx_start\n");
 
+    data = i2c_tx_data;
     return len;
 }
 
 RTOS_I2C_SLAVE_CALLBACK_ATTR
 static void i2c_slave_tx_done(rtos_i2c_slave_t *ctx, void *app_data, uint8_t *data, size_t len)
 {
-    i2c_test_ctx_t *test_ctx_i2c = (i2c_test_ctx_t*)ctx->app_data;
-    // if (test_ctx_i2c->slave_tx_done[test_ctx_i2c->cur_test] != NULL)
-    // {
-    //     I2C_SLAVE_RX_ATTR i2c_slave_tx_done_t fn;
-    //     fn = test_ctx_i2c->slave_tx_done[test_ctx_i2c->cur_test];
-    //     fn(ctx, app_data, data, len);
-    // } else {
-    //     rtos_printf("SLAVE missing i2c_slave_tx_done callback on test %d", test_ctx_i2c->cur_test);
-    // }
+    rtos_printf("i2c_slave_tx_done called\n");
 }
 
 void start_i2c_slave()
 {
-    rtos_printf("rtos_spi_slave_start\n");
+    rtos_printf("start_i2c_slave\n");
     rtos_i2c_slave_start(i2c_slave_ctx,
-                         dummy_app_data_i2c,
+                         &dummy_app_data_i2c,
                          i2c_slave_start,
                          i2c_slave_rx,
                          i2c_slave_tx_start,
@@ -86,3 +69,5 @@ void start_i2c_slave()
                          configMAX_PRIORITIES-1);
 
 }
+
+#endif //APPCONF_SPI_I2C_SLAVE_TEST==1

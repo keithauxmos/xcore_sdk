@@ -20,7 +20,7 @@
 #define SPI_TEST_BUF_SIZE       4096
 
 
-#define I2C_SLAVE_ISR_CORE   4
+#define I2C_SLAVE_ISR_CORE   3
 #define I2C_SLAVE_CORE_MASK  (1 << 2)
 #define I2C_SLAVE_ADDR       0x23
 

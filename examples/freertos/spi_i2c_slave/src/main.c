@@ -12,6 +12,8 @@
 #include "platform/driver_instances.h"
 #include "spi_slave_app.h"
 
+#include "app_conf.h"
+
 
 
 #if APPCONF_SPI_I2C_MASTER_TEST == 1
@@ -32,19 +34,19 @@ void spi_master_task(void *arg) {
   }
 }
 
-#define I2C_DEVICE_ADD  0x23
 #define I2C_DEVICE_REG_ADD  0x45
 void i2c_master_task(void *arg) {
   rtos_printf("i2c send 0x55\n");
   uint8_t I2C_tx_buf[2]={0x99,0x88};
-  uint8_t spi_rx_buf[2];
+  uint8_t I2C_rx_buf[5];
   size_t byte_sent=0;
 
   for (;;) {
-    rtos_i2c_master_reg_write(i2c_master_ctx, I2C_DEVICE_ADD, I2C_DEVICE_REG_ADD, I2C_tx_buf[0]);
+    rtos_i2c_master_reg_write(i2c_master_ctx, I2C_SLAVE_ADDR, I2C_DEVICE_REG_ADD, I2C_tx_buf[0]);
+    vTaskDelay(pdMS_TO_TICKS(500));
 
-    // rtos_printf("SPI Tx spi_rx_buf[0]0x%x, spi_rx_buf[1]0x%x\n",spi_rx_buf[0],spi_rx_buf[1]);
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    rtos_i2c_master_reg_read(i2c_master_ctx, I2C_SLAVE_ADDR, I2C_DEVICE_REG_ADD, I2C_rx_buf);
+    vTaskDelay(pdMS_TO_TICKS(500));
   }
 }
 
