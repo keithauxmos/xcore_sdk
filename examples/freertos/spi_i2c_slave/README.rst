@@ -44,17 +44,11 @@ From the xcore_sdk build folder run:
 
         nmake run_example_freertos_spi_i2c_slave
 
-If successful, you should see the following print messages in the console:
+If successful, you should see the following print messages in the console when there are SPI and I2C transfer from host:
 
 .. code-block:: console
 
-    Hello from tile 0
-    Hello from tile 1
-    Hello from tile 0
-    Hello from tile 1
-    Hello from tile 0
-    Hello from tile 1
-
-And all four LEDs should be blinking. 
+SPI SLAVE xfer done
+i2c_slave_rx called
 
 **Congratulations!**  You've just built and run your first application for xcore.  
